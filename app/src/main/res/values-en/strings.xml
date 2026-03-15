@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Health App</string>
+
+    <!-- Navigation -->
+    <string name="nova_meritev">New Measurement</string>
+    <string name="seznam_meritev">Measurement List</string>
+    <string name="podrobnosti_meritve">Measurement Details</string>
+    <string name="uredi_meritev">Edit Measurement</string>
+
+    <!-- Form labels -->
+    <string name="ime">First Name</string>
+    <string name="priimek">Last Name</string>
+    <string name="datum_meritve">Measurement Date</string>
+    <string name="srcni_utrip">Heart Rate (bpm)</string>
+    <string name="spo2">SpO2 (%)</string>
+    <string name="temperatura">Temperature (°C)</string>
+
+    <!-- Detail labels -->
+    <string name="zdravstveni_podatki">Health Data</string>
+    <string name="srcni_utrip_label">Heart Rate</string>
+    <string name="spo2_label">SpO2</string>
+    <string name="temperatura_label">Temperature</string>
+    <string name="zdravstveno_stanje">Health Status</string>
+    <string name="normalno">Normal</string>
+    <string name="nenormalno">Abnormal</string>
+
+    <!-- Units -->
+    <string name="bpm_value">%d bpm</string>
+    <string name="spo2_value">SpO2: %d%%</string>
+    <string name="spo2_detail_value">%d %%</string>
+    <string name="temp_value">%s °C</string>
+
+    <!-- Buttons -->
+    <string name="shrani_meritev">Save Measurement</string>
+    <string name="btn_seznam_meritev">Measurement List</string>
+    <string name="izbrisi">Delete</string>
+    <string name="preklici">Cancel</string>
+    <string name="potrdi">Confirm</string>
+    <string name="uredi">Edit</string>
+
+    <!-- Validation -->
+    <string name="polje_obvezno">Field is required</string>
+    <string name="srcni_utrip_napaka">Value must be between 30 and 250 bpm</string>
+    <string name="spo2_napaka">Value must be between 0 and 100 %%</string>
+    <string name="temperatura_napaka">Value must be between 34.0 and 42.0 °C</string>
+    <string name="neveljaven_vnos">Invalid input</string>
+
+    <!-- Snackbar -->
+    <string name="meritev_shranjena">Measurement saved successfully!</string>
+    <string name="meritev_posodobljena">Measurement updated successfully!</string>
+    <string name="meritev_izbrisana">Measurement deleted</string>
+    <string name="napaka_shranjevanja">Error saving measurement</string>
+
+    <!-- Delete dialog -->
+    <string name="potrdi_brisanje">Confirm Deletion</string>
+    <string name="potrdi_brisanje_sporocilo">Are you sure you want to delete this measurement?</string>
+
+    <!-- Search -->
+    <string name="iskanje">Search by name…</string>
+
+    <!-- Empty state -->
+    <string name="ni_meritev">No saved measurements</string>
+</resources>
+

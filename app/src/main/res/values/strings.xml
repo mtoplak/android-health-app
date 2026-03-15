@@ -1,3 +1,63 @@
 <resources>
-    <string name="app_name">Health-app</string>
+    <string name="app_name">Zdravstvena aplikacija</string>
+
+    <!-- Navigation -->
+    <string name="nova_meritev">Nova meritev</string>
+    <string name="seznam_meritev">Seznam meritev</string>
+    <string name="podrobnosti_meritve">Podrobnosti meritve</string>
+    <string name="uredi_meritev">Uredi meritev</string>
+
+    <!-- Form labels -->
+    <string name="ime">Ime</string>
+    <string name="priimek">Priimek</string>
+    <string name="datum_meritve">Datum meritve</string>
+    <string name="srcni_utrip">Srčni utrip (bpm)</string>
+    <string name="spo2">SpO2 (%)</string>
+    <string name="temperatura">Temperatura (°C)</string>
+
+    <!-- Detail labels -->
+    <string name="zdravstveni_podatki">Zdravstveni podatki</string>
+    <string name="srcni_utrip_label">Srčni utrip</string>
+    <string name="spo2_label">SpO2</string>
+    <string name="temperatura_label">Temperatura</string>
+    <string name="zdravstveno_stanje">Zdravstveno stanje</string>
+    <string name="normalno">Normalno</string>
+    <string name="nenormalno">Nenormalno</string>
+
+    <!-- Units -->
+    <string name="bpm_value">%d bpm</string>
+    <string name="spo2_value">SpO2: %d%%</string>
+    <string name="spo2_detail_value">%d %%</string>
+    <string name="temp_value">%s °C</string>
+
+    <!-- Buttons -->
+    <string name="shrani_meritev">Shrani meritev</string>
+    <string name="btn_seznam_meritev">Seznam meritev</string>
+    <string name="izbrisi">Izbriši</string>
+    <string name="preklici">Prekliči</string>
+    <string name="potrdi">Potrdi</string>
+    <string name="uredi">Uredi</string>
+
+    <!-- Validation -->
+    <string name="polje_obvezno">Polje je obvezno</string>
+    <string name="srcni_utrip_napaka">Vrednost mora biti med 30 in 250 bpm</string>
+    <string name="spo2_napaka">Vrednost mora biti med 0 in 100 %%</string>
+    <string name="temperatura_napaka">Vrednost mora biti med 34,0 in 42,0 °C</string>
+    <string name="neveljaven_vnos">Neveljaven vnos</string>
+
+    <!-- Snackbar -->
+    <string name="meritev_shranjena">Meritev uspešno shranjena!</string>
+    <string name="meritev_posodobljena">Meritev uspešno posodobljena!</string>
+    <string name="meritev_izbrisana">Meritev izbrisana</string>
+    <string name="napaka_shranjevanja">Napaka pri shranjevanju meritve</string>
+
+    <!-- Delete dialog -->
+    <string name="potrdi_brisanje">Potrdi brisanje</string>
+    <string name="potrdi_brisanje_sporocilo">Ali ste prepričani, da želite izbrisati to meritev?</string>
+
+    <!-- Search -->
+    <string name="iskanje">Iskanje po imenu…</string>
+
+    <!-- Empty state -->
+    <string name="ni_meritev">Ni shranjenih meritev</string>
 </resources>
