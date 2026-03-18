@@ -60,5 +60,6 @@
 
     <!-- Empty state -->
     <string name="ni_meritev">No saved measurements</string>
+    <string name="meritev_ni_najdena">Measurement not found</string>
 </resources>
 

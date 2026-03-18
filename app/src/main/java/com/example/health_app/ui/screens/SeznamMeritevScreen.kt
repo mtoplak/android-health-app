@@ -36,7 +36,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.health_app.R
 import com.example.health_app.data.Meritev
 import com.example.health_app.viewmodel.MeritevViewModel
@@ -63,7 +63,7 @@ fun SeznamMeritevScreen(
     onNavigateToDetail: (Int) -> Unit,
     onNavigateToEdit: (Int) -> Unit
 ) {
-    val vseMeritve by viewModel.vseMeritve.collectAsState()
+    val vseMeritve by viewModel.vseMeritve.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var meritevToDelete by remember { mutableStateOf<Meritev?>(null) }
     var searchQuery by remember { mutableStateOf("") }
@@ -77,7 +77,7 @@ fun SeznamMeritevScreen(
         }
     }
 
-    val operationResult by viewModel.operationResult.collectAsState()
+    val operationResult by viewModel.operationResult.collectAsStateWithLifecycle()
     val msgIzbrisana = stringResource(R.string.meritev_izbrisana)
 
     LaunchedEffect(operationResult) {

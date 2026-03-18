@@ -60,4 +60,5 @@
 
     <!-- Empty state -->
     <string name="ni_meritev">Ni shranjenih meritev</string>
+    <string name="meritev_ni_najdena">Meritev ni najdena</string>
 </resources>

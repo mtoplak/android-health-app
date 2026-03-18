@@ -1,6 +1,7 @@
 package com.example.health_app.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,12 +23,13 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.health_app.R
 import com.example.health_app.viewmodel.MeritevViewModel
 import java.text.SimpleDateFormat
@@ -42,7 +44,8 @@ fun PodrobnostiMeritveScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEdit: (Int) -> Unit
 ) {
-    val meritev by viewModel.getMeritevById(meritevId).collectAsState(initial = null)
+    val meritev by viewModel.getMeritevById(meritevId)
+        .collectAsStateWithLifecycle(initialValue = null)
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     Scaffold(
@@ -179,6 +182,19 @@ fun PodrobnostiMeritveScreen(
                         )
                     }
                 }
+            }
+        } ?: run {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = stringResource(R.string.meritev_ni_najdena),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
     }
