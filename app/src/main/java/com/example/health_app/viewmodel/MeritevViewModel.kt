@@ -9,6 +9,7 @@ import com.example.health_app.R
 import com.example.health_app.data.FirestoreRepository
 import com.example.health_app.data.Meritev
 import com.example.health_app.data.MeritevRepository
+import com.example.health_app.data.Statistics
 import com.example.health_app.network.SensorRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -34,10 +36,12 @@ class MeritevViewModel(
     private val _statusMessage = MutableSharedFlow<String>()
     private val _zadnjaShranjenaId = MutableStateFlow<Int?>(null)
     private val _operationResult = MutableStateFlow<OperationResult?>(null)
+    private val _lastSyncCount = MutableStateFlow<Int?>(null)
 
     val statusMessage = _statusMessage.asSharedFlow()
     val zadnjaShranjenaId: StateFlow<Int?> = _zadnjaShranjenaId.asStateFlow()
     val operationResult: StateFlow<OperationResult?> = _operationResult.asStateFlow()
+    val lastSyncCount: StateFlow<Int?> = _lastSyncCount.asStateFlow()
 
     val vseMeritve: StateFlow<List<Meritev>> = _currentUserId
         .flatMapLatest { userId ->
@@ -47,6 +51,26 @@ class MeritevViewModel(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList()
+        )
+
+    // Real-time cloud meritve (Firestore SnapshotListener)
+    val cloudMeritve: StateFlow<List<Meritev>> = _currentUserId
+        .flatMapLatest { userId ->
+            if (userId.isNullOrBlank()) emptyFlow() else firestoreRepository.getMeritveByUser(userId)
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    // Statistics computed from cloud data (real-time)
+    val statistics: StateFlow<Statistics> = cloudMeritve
+        .map { meritve -> Statistics.fromMeritve(meritve) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = Statistics()
         )
 
     fun setCurrentUser(userId: String?) {
@@ -118,7 +142,8 @@ class MeritevViewModel(
                 repository.deleteAllByUser(uid)
                 remoteMeritve.forEach { repository.vstavi(it.copy(id = 0, userId = uid)) }
                 remoteMeritve.size
-            }.onSuccess {
+            }.onSuccess { syncedCount ->
+                _lastSyncCount.value = syncedCount
                 _operationResult.value = OperationResult.SYNCED
             }.onFailure {
                 _operationResult.value = OperationResult.ERROR
@@ -151,6 +176,7 @@ class MeritevViewModel(
 
     fun clearOperationResult() {
         _operationResult.value = null
+        _lastSyncCount.value = null
     }
 
     enum class OperationResult {

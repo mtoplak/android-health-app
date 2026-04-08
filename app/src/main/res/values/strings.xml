@@ -45,6 +45,11 @@
     <string name="geslo">Geslo</string>
     <string name="pokazi_geslo">Pokaži</string>
     <string name="skrij_geslo">Skrij</string>
+    <string name="prijava_z_google">Prijava z Google</string>
+    <string name="google_sign_in_failed">Google prijava ni uspela</string>
+    <string name="google_sign_in_no_token">Google prijava ni vrnila ID žetona</string>
+    <string name="google_sign_in_cancelled">Google prijava je bila preklicana</string>
+    <string name="google_sign_in_config_error">Google prijava ni pravilno nastavljena (preveri SHA-1/SHA-256 v Firebase)</string>
     <string name="nimas_racuna">Nimaš računa? Registriraj se</string>
     <string name="imas_racun">Imaš račun? Prijavi se</string>
 
@@ -62,7 +67,7 @@
     <string name="meritev_posodobljena">Meritev uspešno posodobljena!</string>
     <string name="meritev_izbrisana">Meritev izbrisana</string>
     <string name="napaka_shranjevanja">Napaka pri shranjevanju meritve</string>
-    <string name="sinhronizirano">Sinhronizacija uspešna</string>
+    <string name="sinhronizirano">Sinhronizirano: %1$d meritev</string>
     <string name="shranjeno_lokalno_oblak_nedosegljiv">Shranjeno lokalno (oblak ni dosegljiv)</string>
 
     <!-- Delete dialog -->
@@ -79,4 +84,12 @@
     <!-- Empty state -->
     <string name="ni_meritev">Ni shranjenih meritev</string>
     <string name="meritev_ni_najdena">Meritev ni najdena</string>
+    
+    <!-- Statistics -->
+    <string name="statistika">Statistika meritev</string>
+    <string name="povprecje">Povprečje</string>
+    <string name="minimum">Minimum</string>
+    <string name="maximum">Maksimum</string>
+    <string name="skupno_meritev">Skupno meritev</string>
+    <string name="trend_meritev">Trend srčnega utripa</string>
 </resources>

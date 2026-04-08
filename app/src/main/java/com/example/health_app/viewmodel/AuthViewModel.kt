@@ -50,6 +50,19 @@ class AuthViewModel(
         }
     }
 
+    fun signInWithGoogle(idToken: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+            runCatching { repository.signInWithGoogle(idToken) }
+                .onSuccess { user ->
+                    _uiState.update { it.copy(currentUser = user, isLoading = false) }
+                }
+                .onFailure { error ->
+                    _uiState.update { it.copy(isLoading = false, error = error.localizedMessage) }
+                }
+        }
+    }
+
     fun logout() {
         repository.logout()
         _uiState.value = AuthUiState()

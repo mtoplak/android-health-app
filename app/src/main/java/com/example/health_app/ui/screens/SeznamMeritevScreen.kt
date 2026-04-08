@@ -64,7 +64,8 @@ fun SeznamMeritevScreen(
     onLogout: () -> Unit,
     loggedInEmail: String?,
     onNavigateToDetail: (Int) -> Unit,
-    onNavigateToEdit: (Int) -> Unit
+    onNavigateToEdit: (Int) -> Unit,
+    onNavigateToStatistics: () -> Unit = {}
 ) {
     val vseMeritve by viewModel.vseMeritve.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -81,8 +82,9 @@ fun SeznamMeritevScreen(
     }
 
     val operationResult by viewModel.operationResult.collectAsStateWithLifecycle()
+    val lastSyncCount by viewModel.lastSyncCount.collectAsStateWithLifecycle()
     val msgIzbrisana = stringResource(R.string.meritev_izbrisana)
-    val msgSync = stringResource(R.string.sinhronizirano)
+    val msgSync = stringResource(R.string.sinhronizirano, lastSyncCount ?: 0)
 
     LaunchedEffect(operationResult) {
         when (operationResult) {
@@ -111,6 +113,9 @@ fun SeznamMeritevScreen(
                     }
                 },
                 actions = {
+                    TextButton(onClick = onNavigateToStatistics) {
+                        Text(stringResource(R.string.statistika))
+                    }
                     TextButton(onClick = onSync) {
                         Text(stringResource(R.string.sinhroniziraj))
                     }

@@ -12,6 +12,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.health_app.ui.screens.AuthScreen
 import com.example.health_app.ui.screens.PodrobnostiMeritveScreen
 import com.example.health_app.ui.screens.SeznamMeritevScreen
+import com.example.health_app.ui.screens.StatisticsScreen
 import com.example.health_app.ui.screens.VnosMeritveScreen
 import com.example.health_app.viewmodel.AuthViewModel
 import com.example.health_app.viewmodel.MeritevViewModel
@@ -21,6 +22,7 @@ object Routes {
     const val VNOS = "vnos"
     const val SEZNAM = "seznam"
     const val PODROBNOSTI = "podrobnosti"
+    const val STATISTIKA = "statistika"
 }
 
 @Composable
@@ -94,6 +96,9 @@ fun NavGraph(
                 },
                 onNavigateToEdit = { id ->
                     navController.navigate("${Routes.VNOS}?meritevId=$id")
+                },
+                onNavigateToStatistics = {
+                    navController.navigate(Routes.STATISTIKA)
                 }
             )
         }
@@ -116,6 +121,16 @@ fun NavGraph(
                 },
                 onNavigateToEdit = { id ->
                     navController.navigate("${Routes.VNOS}?meritevId=$id")
+                }
+            )
+        }
+
+        // Statistics screen
+        composable(route = Routes.STATISTIKA) {
+            StatisticsScreen(
+                viewModel = viewModel,
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }

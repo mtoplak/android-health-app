@@ -1,21 +1,26 @@
 package com.example.health_app.ui.screens
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -35,9 +40,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.health_app.R
 import com.example.health_app.data.Meritev
@@ -74,6 +82,8 @@ fun VnosMeritveScreen(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     var isLoaded by rememberSaveable { mutableStateOf(false) }
     var newlyInsertedId by rememberSaveable { mutableStateOf<Int?>(null) }
+    var existingUserId by rememberSaveable { mutableStateOf("") }
+    var existingFirestoreId by rememberSaveable { mutableStateOf("") }
 
     fun resetForm() {
         ime = ""
@@ -101,6 +111,8 @@ fun VnosMeritveScreen(
             srcniUtripText = it.srcniUtrip.toString()
             spO2Text = it.spO2.toString()
             temperaturaText = it.temperatura.toString()
+            existingUserId = it.userId
+            existingFirestoreId = it.firestoreId
             isLoaded = true
         }
     }
@@ -224,82 +236,61 @@ fun VnosMeritveScreen(
             Spacer(modifier = Modifier.height(12.dp))
 
             // Srčni utrip
-            OutlinedTextField(
+            SensorInputRow(
                 value = srcniUtripText,
                 onValueChange = {
                     srcniUtripText = it
                     srcniUtripError = null
                 },
-                label = { Text(stringResource(R.string.srcni_utrip)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = stringResource(R.string.srcni_utrip),
+                keyboardType = KeyboardType.Number,
                 isError = srcniUtripError != null,
-                supportingText = srcniUtripError?.let { error -> { Text(error) } },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            TextButton(
-                onClick = {
+                supportingText = srcniUtripError,
+                sensorButtonDescription = stringResource(R.string.preberi_srcni_utrip),
+                onSensorRead = {
                     viewModel.preberiSrcniUtrip { value -> srcniUtripText = value.toString() }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.preberi_srcni_utrip))
-            }
+                }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // SpO2
-            OutlinedTextField(
+            SensorInputRow(
                 value = spO2Text,
                 onValueChange = {
                     spO2Text = it
                     spO2Error = null
                 },
-                label = { Text(stringResource(R.string.spo2)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                label = stringResource(R.string.spo2),
+                keyboardType = KeyboardType.Number,
                 isError = spO2Error != null,
-                supportingText = spO2Error?.let { error -> { Text(error) } },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            TextButton(
-                onClick = {
+                supportingText = spO2Error,
+                sensorButtonDescription = stringResource(R.string.preberi_spo2),
+                onSensorRead = {
                     viewModel.preberiSpO2 { value -> spO2Text = value.toString() }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.preberi_spo2))
-            }
+                }
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
 
             // Temperatura
-            OutlinedTextField(
+            SensorInputRow(
                 value = temperaturaText,
                 onValueChange = {
                     temperaturaText = it
                     temperaturaError = null
                 },
-                label = { Text(stringResource(R.string.temperatura)) },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                label = stringResource(R.string.temperatura),
+                keyboardType = KeyboardType.Decimal,
                 isError = temperaturaError != null,
-                supportingText = temperaturaError?.let { error -> { Text(error) } },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true
-            )
-
-            TextButton(
-                onClick = {
+                supportingText = temperaturaError,
+                sensorButtonDescription = stringResource(R.string.preberi_temperaturo),
+                onSensorRead = {
                     viewModel.preberiTemperaturo { value ->
                         temperaturaText = String.format(Locale.US, "%.1f", value)
                     }
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(stringResource(R.string.preberi_temperaturo))
-            }
+                }
+            )
 
             Spacer(modifier = Modifier.height(24.dp))
 
@@ -353,7 +344,9 @@ fun VnosMeritveScreen(
                             datum = datum,
                             srcniUtrip = srcniUtrip!!,
                             spO2 = spO2!!,
-                            temperatura = temperatura!!
+                            temperatura = temperatura!!,
+                            userId = existingUserId,
+                            firestoreId = existingFirestoreId
                         )
                         if (meritevId != null) {
                             viewModel.posodobi(meritev)
@@ -408,6 +401,61 @@ fun VnosMeritveScreen(
         ) {
             DatePicker(state = datePickerState)
         }
+    }
+}
+
+@Composable
+private fun SensorInputRow(
+    value: String,
+    onValueChange: (String) -> Unit,
+    label: String,
+    keyboardType: KeyboardType,
+    isError: Boolean,
+    supportingText: String?,
+    sensorButtonDescription: String,
+    onSensorRead: () -> Unit
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = value,
+            onValueChange = onValueChange,
+            label = { Text(label) },
+            keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
+            isError = isError,
+            supportingText = supportingText?.let { error -> { Text(error) } },
+            modifier = Modifier.weight(1f),
+            singleLine = true
+        )
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        FilledTonalButton(
+            onClick = onSensorRead,
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier.size(width = 64.dp, height = 56.dp),
+            contentPadding = ButtonDefaults.ContentPadding
+        ) {
+            Icon(
+                imageVector = Icons.Default.Refresh,
+                contentDescription = sensorButtonDescription,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+    }
+
+    if (supportingText != null) {
+        Text(
+            text = supportingText,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Start,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, top = 2.dp)
+        )
     }
 }
 

@@ -45,6 +45,11 @@
     <string name="geslo">Password</string>
     <string name="pokazi_geslo">Show</string>
     <string name="skrij_geslo">Hide</string>
+    <string name="prijava_z_google">Sign in with Google</string>
+    <string name="google_sign_in_failed">Google sign-in failed</string>
+    <string name="google_sign_in_no_token">Google sign-in did not return an ID token</string>
+    <string name="google_sign_in_cancelled">Google sign-in was cancelled</string>
+    <string name="google_sign_in_config_error">Google sign-in is misconfigured (check SHA-1/SHA-256 in Firebase)</string>
     <string name="nimas_racuna">No account? Register</string>
     <string name="imas_racun">Already have an account? Login</string>
 
@@ -62,7 +67,7 @@
     <string name="meritev_posodobljena">Measurement updated successfully!</string>
     <string name="meritev_izbrisana">Measurement deleted</string>
     <string name="napaka_shranjevanja">Error saving measurement</string>
-    <string name="sinhronizirano">Synchronization complete</string>
+    <string name="sinhronizirano">Synced: %1$d measurements</string>
     <string name="shranjeno_lokalno_oblak_nedosegljiv">Saved locally (cloud unavailable)</string>
 
     <!-- Delete dialog -->
@@ -77,7 +82,15 @@
     <string name="preberi_temperaturo">Read temperature (API)</string>
 
     <!-- Empty state -->
-    <string name="ni_meritev">No saved measurements</string>
     <string name="meritev_ni_najdena">Measurement not found</string>
+    
+    <!-- Statistics -->
+    <string name="statistika">Statistics</string>
+    <string name="povprecje">Average</string>
+    <string name="minimum">Minimum</string>
+    <string name="maximum">Maximum</string>
+    <string name="skupno_meritev">Total Measurements</string>
+    <string name="trend_meritev">Heart Rate Trend</string>
+    <string name="ni_meritev">No saved measurements</string>
 </resources>
 

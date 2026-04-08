@@ -89,6 +89,13 @@ dependencies {
     implementation(libs.retrofit)
     implementation(libs.retrofit.converter.gson)
 
+    // Google Sign-In
+    implementation(libs.google.play.services.auth)
+
+    // Vico Charts
+    implementation(libs.vico.core)
+    implementation(libs.vico.compose)
+
     // Test
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
