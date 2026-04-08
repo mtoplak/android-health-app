@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Meritev::class], version = 2, exportSchema = false)
+@Database(entities = [Meritev::class], version = 3, exportSchema = false)
 abstract class MeritevDatabase : RoomDatabase() {
 
     abstract fun meritevDao(): MeritevDao
@@ -21,7 +21,7 @@ abstract class MeritevDatabase : RoomDatabase() {
                     MeritevDatabase::class.java,
                     "meritev_database"
                 )
-                    .fallbackToDestructiveMigration(true)
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance

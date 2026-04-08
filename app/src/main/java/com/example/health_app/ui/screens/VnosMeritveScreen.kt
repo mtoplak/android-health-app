@@ -110,6 +110,11 @@ fun VnosMeritveScreen(
     val msgShranjena = stringResource(R.string.meritev_shranjena)
     val msgPosodobljena = stringResource(R.string.meritev_posodobljena)
     val msgNapaka = stringResource(R.string.napaka_shranjevanja)
+    val statusMessage by viewModel.statusMessage.collectAsStateWithLifecycle(initialValue = null)
+
+    LaunchedEffect(statusMessage) {
+        statusMessage?.let { snackbarHostState.showSnackbar(it) }
+    }
 
     LaunchedEffect(operationResult) {
         when (operationResult) {
@@ -233,6 +238,15 @@ fun VnosMeritveScreen(
                 singleLine = true
             )
 
+            TextButton(
+                onClick = {
+                    viewModel.preberiSrcniUtrip { value -> srcniUtripText = value.toString() }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.preberi_srcni_utrip))
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             // SpO2
@@ -250,6 +264,15 @@ fun VnosMeritveScreen(
                 singleLine = true
             )
 
+            TextButton(
+                onClick = {
+                    viewModel.preberiSpO2 { value -> spO2Text = value.toString() }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.preberi_spo2))
+            }
+
             Spacer(modifier = Modifier.height(12.dp))
 
             // Temperatura
@@ -266,6 +289,17 @@ fun VnosMeritveScreen(
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true
             )
+
+            TextButton(
+                onClick = {
+                    viewModel.preberiTemperaturo { value ->
+                        temperaturaText = String.format(Locale.US, "%.1f", value)
+                    }
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.preberi_temperaturo))
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

@@ -23,7 +23,13 @@ interface MeritevDao {
     @Query("SELECT * FROM meritve ORDER BY datum DESC")
     fun getAll(): Flow<List<Meritev>>
 
+    @Query("SELECT * FROM meritve WHERE userId = :userId ORDER BY datum DESC")
+    fun getAllByUser(userId: String): Flow<List<Meritev>>
+
     @Query("SELECT * FROM meritve WHERE id = :id")
     fun getById(id: Int): Flow<Meritev?>
+
+    @Query("DELETE FROM meritve WHERE userId = :userId")
+    suspend fun deleteAllByUser(userId: String)
 }
 

@@ -1,143 +1,131 @@
-# Health App (Android)
+# Health App
 
-A simple Android app for entering and storing personal health measurements.
+Android app for entering, storing, and syncing health measurements.
 
-The app is built with **Jetpack Compose** for UI, **Room** for local persistence, and follows **MVVM + Repository** architecture.
+## What this project includes
 
-## What the app does
-
-- Add a new health measurement (name, surname, date, heart rate, SpO2, temperature)
-- Validate input values before saving
-- Save measurements to a local Room database
-- Show details of a selected measurement
-- Show all saved measurements in a list
-- Edit existing measurements
-- Delete measurements (swipe-to-delete with confirmation)
-- Show Snackbar feedback for insert/update/delete/error operations
-- Support Slovenian and English UI strings
+- Jetpack Compose + Material 3 UI
+- MVVM architecture with Repository layer
+- Room local database (local-first behavior)
+- Firebase Authentication (email/password)
+- Cloud Firestore sync per user (`userId`)
+- Input validation, edit/delete/list/details flows
+- Sensor or mock API autofill support for selected fields
+- Localization with Slovenian and English strings
 
 ## Tech stack
 
 - Kotlin
-- Jetpack Compose + Material 3
+- Jetpack Compose
+- Room + KSP
 - Navigation Compose
 - ViewModel + StateFlow
 - Kotlin Coroutines + Flow
-- Room (with KSP)
+- Firebase Auth + Firestore
+- Retrofit + Gson
 
-## Requirements
+## SDK targets
 
-- Android Studio (recent stable version)
-- Android SDK:
-  - **minSdk = 28**
-  - **targetSdk = 36**
-  - **compileSdk = 36**
-- JDK 11+
+- `minSdk = 28`
+- `targetSdk = 36`
+- `compileSdk = 36`
 
-## Project structure
+## Firebase and Gradle setup
 
-```text
-app/src/main/java/com/example/health_app/
-  data/
-    Meritev.kt
-    MeritevDao.kt
-    MeritevDatabase.kt
-    MeritevRepository.kt
-  ui/
-    navigation/
-      NavGraph.kt
-    screens/
-      VnosMeritveScreen.kt
-      SeznamMeritevScreen.kt
-      PodrobnostiMeritveScreen.kt
-    theme/
-  viewmodel/
-    MeritevViewModel.kt
-  MainActivity.kt
+This project uses a Version Catalog (`gradle/libs.versions.toml`) and plugin aliases.
 
-app/src/main/res/
-  values/strings.xml
-  values-en/strings.xml
+### 1) Place Firebase config file
+
+- Copy `google-services.json` to `app/google-services.json`.
+
+### 2) Use required versions
+
+In `gradle/libs.versions.toml`:
+
+- `googleServices = "4.4.4"`
+- `firebaseBom = "34.11.0"`
+
+### 3) Root Gradle plugin registration
+
+In `build.gradle.kts`:
+
+```kotlin
+plugins {
+    // ...
+    alias(libs.plugins.google.services) apply false
+}
 ```
 
-## Setup instructions
+### 4) App module plugin and Firebase SDKs
 
-1. Open the project in Android Studio.
-2. Let Gradle sync finish.
-3. Make sure an emulator/device with API 28+ is available.
-4. Run the `app` configuration.
+In `app/build.gradle.kts`:
 
-## Run from terminal
+```kotlin
+plugins {
+    id("com.android.application")
+    // or alias(libs.plugins.android.application)
+
+    id("com.google.gms.google-services")
+    // or alias(libs.plugins.google.services)
+}
+
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:34.11.0"))
+
+    // add Firebase products you use
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+}
+```
+
+Equivalent alias-based setup already used in this project:
+
+- `implementation(platform(libs.firebase.bom))`
+- `implementation(libs.firebase.auth)`
+- `implementation(libs.firebase.firestore)`
+
+### 5) Sync project
 
 ```powershell
-Set-Location "D:\1\TZVA\android-health-app"
-.\gradlew.bat assembleDebug
+.\gradlew.bat --refresh-dependencies
 ```
 
-Optional Kotlin compile check:
+## Firebase Console checklist
+
+1. Create a Firebase project.
+2. Add Android app with package `com.example.health_app`.
+3. Enable `Authentication > Sign-in method > Email/Password`.
+4. Create Firestore database (test mode for development).
+
+## Firestore security rules (recommended)
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /meritve/{meritevId} {
+      allow read, write: if request.auth != null
+                         && request.auth.uid == resource.data.userId;
+      allow create: if request.auth != null
+                    && request.auth.uid == request.resource.data.userId;
+    }
+  }
+}
+```
+
+## Run
 
 ```powershell
-Set-Location "D:\1\TZVA\android-health-app"
-.\gradlew.bat :app:compileDebugKotlin
+.\gradlew.bat :app:assembleDebug
 ```
 
-## Navigation flow
+Then run from Android Studio on an emulator/device (API 28+).
 
-- `VnosMeritveScreen` (input form)
-  - Save -> persists measurement and opens details/list flow
-  - "Seznam meritev" button -> opens list
-- `SeznamMeritevScreen` (all measurements)
-  - Tap card -> open details
-  - Edit icon -> open input form pre-filled
-  - Swipe left -> delete confirmation
-- `PodrobnostiMeritveScreen` (single measurement details)
-  - Back navigation
-  - Edit action
+## Quick verification checklist
 
-## Validation rules
-
-Before saving:
-
-- `ime` and `priimek` must not be empty
-- `srcniUtrip` must be between **30 and 250** bpm
-- `SpO2` must be between **0 and 100**
-- `temperatura` must be between **34.0 and 42.0** °C
-
-Invalid fields display inline error text.
-
-## Database details
-
-- Entity: `Meritev`
-- Table: `meritve`
-- DAO operations:
-  - `insert`
-  - `update`
-  - `delete`
-  - `getAll(): Flow<List<Meritev>>`
-  - `getById(id: Int): Flow<Meritev?>`
-
-`MeritevDatabase` is implemented as a singleton Room database.
-
-## Language support
-
-All UI strings are externalized:
-
-- Slovenian: `app/src/main/res/values/strings.xml`
-- English: `app/src/main/res/values-en/strings.xml`
-
-## Notes
-
-- Date input uses Material 3 `DatePickerDialog`.
-- The app uses reactive flows from Room so the list updates automatically when data changes.
-- Current Room setup uses destructive migration fallback for schema version changes during development.
-
-## Quick test checklist
-
-- Insert valid measurement -> success snackbar appears
-- Invalid inputs -> field-level error messages appear
-- Open list -> new measurement is visible
-- Open details -> all fields shown correctly
-- Edit measurement -> changes are saved
-- Delete measurement -> item is removed after confirmation
-- Switch device language (SL/EN) -> strings change correctly
-
+- Register user with valid email and password (6+ chars)
+- Login and open measurement input screen
+- Save measurement and confirm list/details update
+- Trigger cloud sync and verify Firestore documents
+- Logout and confirm app returns to auth screen
+- Switch language and verify translated strings

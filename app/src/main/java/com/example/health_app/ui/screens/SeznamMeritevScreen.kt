@@ -60,6 +60,9 @@ import java.util.Locale
 fun SeznamMeritevScreen(
     viewModel: MeritevViewModel,
     onNavigateBack: () -> Unit,
+    onSync: () -> Unit,
+    onLogout: () -> Unit,
+    loggedInEmail: String?,
     onNavigateToDetail: (Int) -> Unit,
     onNavigateToEdit: (Int) -> Unit
 ) {
@@ -79,11 +82,19 @@ fun SeznamMeritevScreen(
 
     val operationResult by viewModel.operationResult.collectAsStateWithLifecycle()
     val msgIzbrisana = stringResource(R.string.meritev_izbrisana)
+    val msgSync = stringResource(R.string.sinhronizirano)
 
     LaunchedEffect(operationResult) {
-        if (operationResult == MeritevViewModel.OperationResult.DELETED) {
-            snackbarHostState.showSnackbar(msgIzbrisana)
-            viewModel.clearOperationResult()
+        when (operationResult) {
+            MeritevViewModel.OperationResult.DELETED -> {
+                snackbarHostState.showSnackbar(msgIzbrisana)
+                viewModel.clearOperationResult()
+            }
+            MeritevViewModel.OperationResult.SYNCED -> {
+                snackbarHostState.showSnackbar(msgSync)
+                viewModel.clearOperationResult()
+            }
+            else -> Unit
         }
     }
 
@@ -98,6 +109,14 @@ fun SeznamMeritevScreen(
                             contentDescription = stringResource(R.string.preklici)
                         )
                     }
+                },
+                actions = {
+                    TextButton(onClick = onSync) {
+                        Text(stringResource(R.string.sinhroniziraj))
+                    }
+                    TextButton(onClick = onLogout) {
+                        Text(stringResource(R.string.odjava))
+                    }
                 }
             )
         },
@@ -109,6 +128,15 @@ fun SeznamMeritevScreen(
                 .padding(paddingValues)
         ) {
             // Search bar
+            if (!loggedInEmail.isNullOrBlank()) {
+                Text(
+                    text = stringResource(R.string.prijavljen_kot, loggedInEmail),
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
             androidx.compose.material3.OutlinedTextField(
                 value = searchQuery,
                 onValueChange = { searchQuery = it },

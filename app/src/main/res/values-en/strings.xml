@@ -37,6 +37,16 @@
     <string name="preklici">Cancel</string>
     <string name="potrdi">Confirm</string>
     <string name="uredi">Edit</string>
+    <string name="sinhroniziraj">Sync</string>
+    <string name="odjava">Logout</string>
+    <string name="prijava">Login</string>
+    <string name="registracija">Register</string>
+    <string name="email">Email</string>
+    <string name="geslo">Password</string>
+    <string name="pokazi_geslo">Show</string>
+    <string name="skrij_geslo">Hide</string>
+    <string name="nimas_racuna">No account? Register</string>
+    <string name="imas_racun">Already have an account? Login</string>
 
     <!-- Validation -->
     <string name="polje_obvezno">Field is required</string>
@@ -44,12 +54,16 @@
     <string name="spo2_napaka">Value must be between 0 and 100 %%</string>
     <string name="temperatura_napaka">Value must be between 34.0 and 42.0 °C</string>
     <string name="neveljaven_vnos">Invalid input</string>
+    <string name="neveljaven_email">Invalid email format</string>
+    <string name="geslo_prekratko">Password must be at least 6 characters</string>
 
     <!-- Snackbar -->
     <string name="meritev_shranjena">Measurement saved successfully!</string>
     <string name="meritev_posodobljena">Measurement updated successfully!</string>
     <string name="meritev_izbrisana">Measurement deleted</string>
     <string name="napaka_shranjevanja">Error saving measurement</string>
+    <string name="sinhronizirano">Synchronization complete</string>
+    <string name="shranjeno_lokalno_oblak_nedosegljiv">Saved locally (cloud unavailable)</string>
 
     <!-- Delete dialog -->
     <string name="potrdi_brisanje">Confirm Deletion</string>
@@ -57,6 +71,10 @@
 
     <!-- Search -->
     <string name="iskanje">Search by name…</string>
+    <string name="prijavljen_kot">Signed in: %1$s</string>
+    <string name="preberi_srcni_utrip">Read heart rate (sensor/API)</string>
+    <string name="preberi_spo2">Read SpO2 (API)</string>
+    <string name="preberi_temperaturo">Read temperature (API)</string>
 
     <!-- Empty state -->
     <string name="ni_meritev">No saved measurements</string>

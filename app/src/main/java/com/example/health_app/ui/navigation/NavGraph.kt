@@ -1,17 +1,23 @@
 package com.example.health_app.ui.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.health_app.ui.screens.AuthScreen
 import com.example.health_app.ui.screens.PodrobnostiMeritveScreen
 import com.example.health_app.ui.screens.SeznamMeritevScreen
 import com.example.health_app.ui.screens.VnosMeritveScreen
+import com.example.health_app.viewmodel.AuthViewModel
 import com.example.health_app.viewmodel.MeritevViewModel
 
 object Routes {
+    const val AUTH = "auth"
     const val VNOS = "vnos"
     const val SEZNAM = "seznam"
     const val PODROBNOSTI = "podrobnosti"
@@ -20,12 +26,31 @@ object Routes {
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    viewModel: MeritevViewModel
+    viewModel: MeritevViewModel,
+    authViewModel: AuthViewModel
 ) {
+    val authState by authViewModel.uiState.collectAsStateWithLifecycle()
+    val startDestination = if (authState.currentUser != null) Routes.VNOS else Routes.AUTH
+
+    LaunchedEffect(authState.currentUser?.uid) {
+        viewModel.setCurrentUser(authState.currentUser?.uid)
+    }
+
     NavHost(
         navController = navController,
-        startDestination = Routes.VNOS
+        startDestination = startDestination
     ) {
+        composable(route = Routes.AUTH) {
+            AuthScreen(
+                authViewModel = authViewModel,
+                onAuthSuccess = {
+                    navController.navigate(Routes.VNOS) {
+                        popUpTo(Routes.AUTH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         // View 1 – Input form (new or edit)
         composable(
             route = "${Routes.VNOS}?meritevId={meritevId}",
@@ -56,6 +81,14 @@ fun NavGraph(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+                onSync = { viewModel.syncFromFirestore() },
+                onLogout = {
+                    authViewModel.logout()
+                    navController.navigate(Routes.AUTH) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                loggedInEmail = authState.currentUser?.email,
                 onNavigateToDetail = { id ->
                     navController.navigate("${Routes.PODROBNOSTI}/$id")
                 },

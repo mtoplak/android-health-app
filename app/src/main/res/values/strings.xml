@@ -37,6 +37,16 @@
     <string name="preklici">Prekliči</string>
     <string name="potrdi">Potrdi</string>
     <string name="uredi">Uredi</string>
+    <string name="sinhroniziraj">Sinhroniziraj</string>
+    <string name="odjava">Odjava</string>
+    <string name="prijava">Prijava</string>
+    <string name="registracija">Registracija</string>
+    <string name="email">E-pošta</string>
+    <string name="geslo">Geslo</string>
+    <string name="pokazi_geslo">Pokaži</string>
+    <string name="skrij_geslo">Skrij</string>
+    <string name="nimas_racuna">Nimaš računa? Registriraj se</string>
+    <string name="imas_racun">Imaš račun? Prijavi se</string>
 
     <!-- Validation -->
     <string name="polje_obvezno">Polje je obvezno</string>
@@ -44,12 +54,16 @@
     <string name="spo2_napaka">Vrednost mora biti med 0 in 100 %%</string>
     <string name="temperatura_napaka">Vrednost mora biti med 34,0 in 42,0 °C</string>
     <string name="neveljaven_vnos">Neveljaven vnos</string>
+    <string name="neveljaven_email">Neveljavna oblika e-pošte</string>
+    <string name="geslo_prekratko">Geslo mora imeti vsaj 6 znakov</string>
 
     <!-- Snackbar -->
     <string name="meritev_shranjena">Meritev uspešno shranjena!</string>
     <string name="meritev_posodobljena">Meritev uspešno posodobljena!</string>
     <string name="meritev_izbrisana">Meritev izbrisana</string>
     <string name="napaka_shranjevanja">Napaka pri shranjevanju meritve</string>
+    <string name="sinhronizirano">Sinhronizacija uspešna</string>
+    <string name="shranjeno_lokalno_oblak_nedosegljiv">Shranjeno lokalno (oblak ni dosegljiv)</string>
 
     <!-- Delete dialog -->
     <string name="potrdi_brisanje">Potrdi brisanje</string>
@@ -57,6 +71,10 @@
 
     <!-- Search -->
     <string name="iskanje">Iskanje po imenu…</string>
+    <string name="prijavljen_kot">Prijavljen: %1$s</string>
+    <string name="preberi_srcni_utrip">Preberi srčni utrip (senzor/API)</string>
+    <string name="preberi_spo2">Preberi SpO2 (API)</string>
+    <string name="preberi_temperaturo">Preberi temperaturo (API)</string>
 
     <!-- Empty state -->
     <string name="ni_meritev">Ni shranjenih meritev</string>

@@ -8,6 +8,8 @@ class MeritevRepository(private val meritevDao: MeritevDao) {
 
     fun getMeritevById(id: Int): Flow<Meritev?> = meritevDao.getById(id)
 
+    fun getMeritveByUser(userId: String): Flow<List<Meritev>> = meritevDao.getAllByUser(userId)
+
     suspend fun vstavi(meritev: Meritev): Long {
         return meritevDao.insert(meritev)
     }
@@ -18,6 +20,10 @@ class MeritevRepository(private val meritevDao: MeritevDao) {
 
     suspend fun izbrisi(meritev: Meritev) {
         meritevDao.delete(meritev)
+    }
+
+    suspend fun deleteAllByUser(userId: String) {
+        meritevDao.deleteAllByUser(userId)
     }
 }
 
