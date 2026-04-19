@@ -10,7 +10,12 @@ import com.example.health_app.data.FirestoreRepository
 import com.example.health_app.data.Meritev
 import com.example.health_app.data.MeritevRepository
 import com.example.health_app.data.Statistics
+import com.example.health_app.ml.GeminiHelper
+import com.example.health_app.ml.HealthClassifier
+import com.example.health_app.ml.HealthPrediction
+import com.example.health_app.ml.HealthStatus
 import com.example.health_app.network.SensorRepository
+import java.util.Locale
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +34,9 @@ class MeritevViewModel(
     application: Application,
     private val repository: MeritevRepository,
     private val firestoreRepository: FirestoreRepository,
-    private val sensorRepository: SensorRepository
+    private val sensorRepository: SensorRepository,
+    private val healthClassifier: HealthClassifier,
+    private val geminiHelper: GeminiHelper
 ) : AndroidViewModel(application) {
 
     private val _currentUserId = MutableStateFlow<String?>(null)
@@ -37,11 +44,15 @@ class MeritevViewModel(
     private val _zadnjaShranjenaId = MutableStateFlow<Int?>(null)
     private val _operationResult = MutableStateFlow<OperationResult?>(null)
     private val _lastSyncCount = MutableStateFlow<Int?>(null)
+    private val _healthPrediction = MutableStateFlow<HealthPrediction?>(null)
+    private val _aiSummaryState = MutableStateFlow(AiSummaryUiState())
 
     val statusMessage = _statusMessage.asSharedFlow()
     val zadnjaShranjenaId: StateFlow<Int?> = _zadnjaShranjenaId.asStateFlow()
     val operationResult: StateFlow<OperationResult?> = _operationResult.asStateFlow()
     val lastSyncCount: StateFlow<Int?> = _lastSyncCount.asStateFlow()
+    val healthPrediction: StateFlow<HealthPrediction?> = _healthPrediction.asStateFlow()
+    val aiSummaryState: StateFlow<AiSummaryUiState> = _aiSummaryState.asStateFlow()
 
     val vseMeritve: StateFlow<List<Meritev>> = _currentUserId
         .flatMapLatest { userId ->
@@ -101,6 +112,11 @@ class MeritevViewModel(
                 }
 
                 _zadnjaShranjenaId.value = insertedId
+                _healthPrediction.value = healthClassifier.classify(
+                    hr = withUser.srcniUtrip,
+                    spo2 = withUser.spO2,
+                    temp = withUser.temperatura
+                )
                 onInserted(insertedId)
                 _operationResult.value = OperationResult.INSERTED
             } catch (_: Exception) {
@@ -174,6 +190,60 @@ class MeritevViewModel(
         }
     }
 
+    fun classifyMeasurement(meritev: Meritev) {
+        _healthPrediction.value = healthClassifier.classify(
+            hr = meritev.srcniUtrip,
+            spo2 = meritev.spO2,
+            temp = meritev.temperatura
+        )
+    }
+
+    fun getHealthStatusLabel(status: HealthStatus): Int {
+        return when (status) {
+            HealthStatus.NORMAL -> R.string.normalno
+            HealthStatus.ELEVATED -> R.string.povisano
+            HealthStatus.CRITICAL -> R.string.kriticno
+        }
+    }
+
+    fun generateAiSummary() {
+        val meritve = cloudMeritve.value.ifEmpty { vseMeritve.value }
+        viewModelScope.launch {
+            _aiSummaryState.value = AiSummaryUiState(isLoading = true)
+            runCatching { geminiHelper.generateSummary(meritve) }
+                .onSuccess { summary ->
+                    _aiSummaryState.value = AiSummaryUiState(summary = summary)
+                }
+                .onFailure { error ->
+                    _aiSummaryState.value = AiSummaryUiState(
+                        summary = buildFallbackAiSummary(meritve),
+                        error = if (meritve.isEmpty()) {
+                            error.localizedMessage ?: getApplication<Application>().getString(R.string.ai_povzetek_napaka)
+                        } else {
+                            null
+                        }
+                    )
+                }
+        }
+    }
+
+    private fun buildFallbackAiSummary(meritve: List<Meritev>): String {
+        if (meritve.isEmpty()) return getApplication<Application>().getString(R.string.ni_meritev)
+
+        val zadnje = meritve.sortedByDescending { it.datum }.take(10)
+        val avgHr = zadnje.map { it.srcniUtrip }.average()
+        val avgSpo2 = zadnje.map { it.spO2 }.average()
+        val avgTemp = zadnje.map { it.temperatura }.average()
+
+        return getApplication<Application>().getString(
+            R.string.ai_local_fallback,
+            zadnje.size,
+            String.format(Locale.getDefault(), "%.0f", avgHr),
+            String.format(Locale.getDefault(), "%.0f", avgSpo2),
+            String.format(Locale.getDefault(), "%.1f", avgTemp)
+        )
+    }
+
     fun clearOperationResult() {
         _operationResult.value = null
         _lastSyncCount.value = null
@@ -182,13 +252,21 @@ class MeritevViewModel(
     enum class OperationResult {
         INSERTED, UPDATED, DELETED, SYNCED, ERROR
     }
+
+    data class AiSummaryUiState(
+        val summary: String? = null,
+        val isLoading: Boolean = false,
+        val error: String? = null
+    )
 }
 
 class MeritevViewModelFactory(
     private val application: Application,
     private val repository: MeritevRepository,
     private val firestoreRepository: FirestoreRepository,
-    private val sensorRepository: SensorRepository
+    private val sensorRepository: SensorRepository,
+    private val healthClassifier: HealthClassifier,
+    private val geminiHelper: GeminiHelper
 ) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MeritevViewModel::class.java)) {
@@ -197,7 +275,9 @@ class MeritevViewModelFactory(
                 application = application,
                 repository = repository,
                 firestoreRepository = firestoreRepository,
-                sensorRepository = sensorRepository
+                sensorRepository = sensorRepository,
+                healthClassifier = healthClassifier,
+                geminiHelper = geminiHelper
             ) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")

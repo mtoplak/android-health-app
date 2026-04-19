@@ -12,6 +12,8 @@ Android app for entering, storing, and syncing health measurements.
 - Input validation, edit/delete/list/details flows
 - Sensor or mock API autofill support for selected fields
 - Localization with Slovenian and English strings
+- TensorFlow Lite health status classification (Normal/Elevated/Critical)
+- Gemini AI summary card on the statistics screen
 
 ## Tech stack
 
@@ -23,6 +25,8 @@ Android app for entering, storing, and syncing health measurements.
 - Kotlin Coroutines + Flow
 - Firebase Auth + Firestore
 - Retrofit + Gson
+- TensorFlow Lite
+- Gemini API (Google AI SDK)
 
 ## SDK targets
 
@@ -90,6 +94,35 @@ Equivalent alias-based setup already used in this project:
 .\gradlew.bat --refresh-dependencies
 ```
 
+## Gemini API setup
+
+Add your API key to `local.properties` (project root):
+
+```properties
+GEMINI_API_KEY=YOUR_API_KEY_HERE
+```
+
+The key is injected into `BuildConfig.GEMINI_API_KEY` via `app/build.gradle.kts`.
+
+## TensorFlow Lite setup
+
+Place your model file here:
+
+- `app/src/main/assets/health_classifier.tflite`
+
+Current implementation automatically falls back to a rule-based classifier when the model file is missing or cannot be loaded.
+
+You can generate the model with the included scripts:
+
+```powershell
+Set-Location "D:\1\TZVA\android-health-app"
+py -m pip install -r .\ml\requirements.txt
+py .\ml\train_health_classifier.py
+py .\ml\test_tflite_model.py
+```
+
+If local training fails because of low disk/RAM, use Google Colab and copy the exported `health_classifier.tflite` into `app/src/main/assets/`.
+
 ## Firebase Console checklist
 
 1. Create a Firebase project.
@@ -129,3 +162,5 @@ Then run from Android Studio on an emulator/device (API 28+).
 - Trigger cloud sync and verify Firestore documents
 - Logout and confirm app returns to auth screen
 - Switch language and verify translated strings
+- Open details screen and verify health status classification + confidence
+- Open statistics screen and generate Gemini AI summary

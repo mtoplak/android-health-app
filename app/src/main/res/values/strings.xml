@@ -22,6 +22,8 @@
     <string name="temperatura_label">Temperatura</string>
     <string name="zdravstveno_stanje">Zdravstveno stanje</string>
     <string name="normalno">Normalno</string>
+    <string name="povisano">Povišano</string>
+    <string name="kriticno">Kritično</string>
     <string name="nenormalno">Nenormalno</string>
 
     <!-- Units -->
@@ -92,4 +94,12 @@
     <string name="maximum">Maksimum</string>
     <string name="skupno_meritev">Skupno meritev</string>
     <string name="trend_meritev">Trend srčnega utripa</string>
+    <string name="ai_asistent">AI asistent</string>
+    <string name="generiraj_ai_povzetek">Generiraj AI povzetek</string>
+    <string name="ai_povzetek_namig">Klikni gumb za generiranje povzetka zadnjih meritev.</string>
+    <string name="ai_povzetek_napaka">Generiranje AI povzetka ni uspelo</string>
+    <string name="ai_local_fallback">Lokalni povzetek: zadnjih %1$d meritev kaže povprečni srčni utrip %2$s bpm, SpO₂ %3$s %% in temperaturo %4$s °C.</string>
+    <string name="confidence_line">Zaupanje - Normalno: %1$d%%, Povišano: %2$d%%, Kritično: %3$d%%</string>
+    <string name="tflite_model_used">Klasifikacija: TensorFlow Lite model</string>
+    <string name="rule_based_fallback">Klasifikacija: fallback pravila (model ni na voljo)</string>
 </resources>

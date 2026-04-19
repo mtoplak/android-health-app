@@ -1,0 +1,18 @@
+{
+  "class_order": [
+    "NORMAL",
+    "ELEVATED",
+    "CRITICAL"
+  ],
+  "input": [
+    "srcniUtrip",
+    "spO2",
+    "temperatura"
+  ],
+  "input_shape": [
+    1,
+    3
+  ],
+  "dtype": "float32",
+  "notes": "Trained on synthetic data labeled by task rules."
+}

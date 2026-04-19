@@ -10,6 +10,8 @@ import com.example.health_app.data.FirestoreRepository
 import androidx.navigation.compose.rememberNavController
 import com.example.health_app.data.MeritevDatabase
 import com.example.health_app.data.MeritevRepository
+import com.example.health_app.ml.GeminiHelper
+import com.example.health_app.ml.HealthClassifier
 import com.example.health_app.network.SensorRepository
 import com.example.health_app.ui.navigation.NavGraph
 import com.example.health_app.ui.theme.HealthAppTheme
@@ -28,11 +30,15 @@ class MainActivity : ComponentActivity() {
         val repository = MeritevRepository(database.meritevDao())
         val firestoreRepository = FirestoreRepository()
         val sensorRepository = SensorRepository(applicationContext)
+        val healthClassifier = HealthClassifier(applicationContext)
+        val geminiHelper = GeminiHelper()
         val viewModelFactory = MeritevViewModelFactory(
             application = application,
             repository = repository,
             firestoreRepository = firestoreRepository,
-            sensorRepository = sensorRepository
+            sensorRepository = sensorRepository,
+            healthClassifier = healthClassifier,
+            geminiHelper = geminiHelper
         )
         val viewModel = ViewModelProvider(this, viewModelFactory)[MeritevViewModel::class.java]
 

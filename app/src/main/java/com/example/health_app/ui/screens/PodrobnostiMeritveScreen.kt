@@ -23,14 +23,17 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.health_app.R
+import com.example.health_app.ml.HealthStatus
 import com.example.health_app.viewmodel.MeritevViewModel
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -46,7 +49,12 @@ fun PodrobnostiMeritveScreen(
 ) {
     val meritev by viewModel.getMeritevById(meritevId)
         .collectAsStateWithLifecycle(initialValue = null)
+    val healthPrediction by viewModel.healthPrediction.collectAsStateWithLifecycle()
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+
+    LaunchedEffect(meritev?.id) {
+        meritev?.let { viewModel.classifyMeasurement(it) }
+    }
 
     Scaffold(
         topBar = {
@@ -146,39 +154,73 @@ fun PodrobnostiMeritveScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Health status card
-                val isNormal = m.srcniUtrip in 60..100 &&
-                        m.spO2 >= 95 &&
-                        m.temperatura in 36.0..37.5
+                // Health status card (TensorFlow Lite + fallback heuristika)
+                val prediction = healthPrediction
+                val status = prediction?.status ?: HealthStatus.ELEVATED
+                val statusText = stringResource(viewModel.getHealthStatusLabel(status))
+                val confidence = prediction?.confidence.orEmpty()
+                val normalPct = ((confidence[HealthStatus.NORMAL] ?: 0f) * 100).toInt()
+                val elevatedPct = ((confidence[HealthStatus.ELEVATED] ?: 0f) * 100).toInt()
+                val criticalPct = ((confidence[HealthStatus.CRITICAL] ?: 0f) * 100).toInt()
+
+                val statusContainerColor = when (status) {
+                    HealthStatus.NORMAL -> MaterialTheme.colorScheme.secondaryContainer
+                    HealthStatus.ELEVATED -> Color(0xFFFFE0B2)
+                    HealthStatus.CRITICAL -> MaterialTheme.colorScheme.errorContainer
+                }
+
+                val statusTextColor = when (status) {
+                    HealthStatus.NORMAL -> MaterialTheme.colorScheme.primary
+                    HealthStatus.ELEVATED -> Color(0xFFEF6C00)
+                    HealthStatus.CRITICAL -> MaterialTheme.colorScheme.error
+                }
 
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = if (isNormal)
-                            MaterialTheme.colorScheme.secondaryContainer
-                        else
-                            MaterialTheme.colorScheme.errorContainer
+                        containerColor = statusContainerColor
                     )
                 ) {
-                    Row(
+                    Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
+                            .padding(20.dp)
                     ) {
+                        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()) {
+                            Text(
+                                text = stringResource(R.string.zdravstveno_stanje),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = statusText,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                color = statusTextColor
+                            )
+                        }
+
+                        Spacer(modifier = Modifier.height(10.dp))
+
                         Text(
-                            text = stringResource(R.string.zdravstveno_stanje),
-                            style = MaterialTheme.typography.titleMedium
+                            text = stringResource(
+                                R.string.confidence_line,
+                                normalPct,
+                                elevatedPct,
+                                criticalPct
+                            ),
+                            style = MaterialTheme.typography.bodyMedium
                         )
+
+                        Spacer(modifier = Modifier.height(4.dp))
+
                         Text(
-                            text = if (isNormal) stringResource(R.string.normalno)
-                                   else stringResource(R.string.nenormalno),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (isNormal)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.error
+                            text = if (prediction?.fromTflite == true) {
+                                stringResource(R.string.tflite_model_used)
+                            } else {
+                                stringResource(R.string.rule_based_fallback)
+                            },
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }

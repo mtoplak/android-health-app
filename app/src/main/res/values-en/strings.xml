@@ -22,6 +22,8 @@
     <string name="temperatura_label">Temperature</string>
     <string name="zdravstveno_stanje">Health Status</string>
     <string name="normalno">Normal</string>
+    <string name="povisano">Elevated</string>
+    <string name="kriticno">Critical</string>
     <string name="nenormalno">Abnormal</string>
 
     <!-- Units -->
@@ -91,6 +93,14 @@
     <string name="maximum">Maximum</string>
     <string name="skupno_meritev">Total Measurements</string>
     <string name="trend_meritev">Heart Rate Trend</string>
+    <string name="ai_asistent">AI Assistant</string>
+    <string name="generiraj_ai_povzetek">Generate AI Summary</string>
+    <string name="ai_povzetek_namig">Tap the button to generate a summary of recent measurements.</string>
+    <string name="ai_povzetek_napaka">Failed to generate AI summary</string>
+    <string name="ai_local_fallback">Local summary: the last %1$d measurements show an average heart rate of %2$s bpm, SpO₂ of %3$s%%, and temperature of %4$s °C.</string>
+    <string name="confidence_line">Confidence - Normal: %1$d%%, Elevated: %2$d%%, Critical: %3$d%%</string>
+    <string name="tflite_model_used">Classification: TensorFlow Lite model</string>
+    <string name="rule_based_fallback">Classification: rule-based fallback (model unavailable)</string>
     <string name="ni_meritev">No saved measurements</string>
 </resources>
 
