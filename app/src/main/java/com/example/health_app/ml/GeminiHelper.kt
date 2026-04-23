@@ -2,13 +2,7 @@ package com.example.health_app.ml
 
 import com.example.health_app.BuildConfig
 import com.example.health_app.data.Meritev
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import org.json.JSONObject
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.net.HttpURLConnection
-import java.net.URL
+import com.google.ai.client.generativeai.GenerativeModel
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -16,7 +10,7 @@ import java.util.Locale
 class GeminiHelper {
 
     private val apiKey: String = BuildConfig.GEMINI_API_KEY
-    private val endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent"
+    private val modelNames = listOf("gemini-flash-latest", "gemini-2.0-flash")
 
     suspend fun generateSummary(meritve: List<Meritev>): String {
         if (apiKey.isBlank()) {
@@ -42,8 +36,7 @@ class GeminiHelper {
                 $input
             """.trimIndent()
 
-            val response = callGeminiRest(prompt)
-            extractGeminiText(response)?.trim().orEmpty().ifBlank {
+            generateWithSdk(prompt).orEmpty().ifBlank {
                 generateLocalSummary(meritve, includeFallbackNote = true)
             }
         }.getOrElse {
@@ -51,61 +44,20 @@ class GeminiHelper {
         }
     }
 
-    private suspend fun callGeminiRest(prompt: String): String = withContext(Dispatchers.IO) {
-        val url = URL(endpoint)
-        val body = JSONObject()
-            .put(
-                "contents",
-                org.json.JSONArray().put(
-                    JSONObject().put(
-                        "parts",
-                        org.json.JSONArray().put(JSONObject().put("text", prompt))
-                    )
-                )
-            )
-            .toString()
+    private suspend fun generateWithSdk(prompt: String): String? {
+        for (modelName in modelNames) {
+            val text = runCatching {
+                val model = GenerativeModel(modelName = modelName, apiKey = apiKey)
+                model.generateContent(prompt).text?.trim()
+            }.getOrNull()
 
-        val connection = (url.openConnection() as HttpURLConnection).apply {
-            requestMethod = "POST"
-            connectTimeout = 15_000
-            readTimeout = 30_000
-            doInput = true
-            doOutput = true
-            setRequestProperty("Content-Type", "application/json; charset=utf-8")
-            setRequestProperty("x-goog-api-key", apiKey)
+            if (!text.isNullOrBlank()) {
+                return text
+            }
         }
-
-        try {
-            connection.outputStream.use { os ->
-                os.write(body.toByteArray(Charsets.UTF_8))
-            }
-
-            val stream = if (connection.responseCode in 200..299) {
-                connection.inputStream
-            } else {
-                connection.errorStream ?: connection.inputStream
-            }
-
-            BufferedReader(InputStreamReader(stream)).use { reader ->
-                reader.readText()
-            }
-        } finally {
-            connection.disconnect()
-        }
+        return null
     }
 
-    private fun extractGeminiText(rawResponse: String): String? {
-        if (rawResponse.isBlank()) return null
-        return runCatching {
-            val root = JSONObject(rawResponse)
-            val candidates = root.optJSONArray("candidates") ?: return null
-            val firstCandidate = candidates.optJSONObject(0) ?: return null
-            val content = firstCandidate.optJSONObject("content") ?: return null
-            val parts = content.optJSONArray("parts") ?: return null
-            val firstPart = parts.optJSONObject(0) ?: return null
-            firstPart.optString("text").takeIf { it.isNotBlank() }
-        }.getOrNull()
-    }
 
     private fun generateLocalSummary(
         meritve: List<Meritev>,
